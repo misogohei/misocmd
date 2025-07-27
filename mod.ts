@@ -109,7 +109,10 @@ function appendMisoCommand<T extends string>(
   };
 }
 
-export function buildMisoCommand(path: string, option?: IMisoBuildOption) {
+export function buildMisoCommand(
+  path: string,
+  option?: IMisoBuildOption,
+): IMisoCommandBuilder<""> {
   const executor = new MisoCommandExecutor(path, option);
   return appendMisoCommand(createMisoCommand("", [], executor), executor);
 }
