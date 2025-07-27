@@ -1,5 +1,5 @@
 {
-  "name": "@misogoei/misocmd",
+  "name": "@misogohei/misocmd",
   "version": "0.1.0",
   "exports": "./mod.ts",
   "tasks": {
