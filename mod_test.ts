@@ -1,14 +1,14 @@
 import { assertEquals, assertExists } from "@std/assert";
-import { buildMisoCommand } from "@misogoei/misocmd";
+import { buildMisoCommand } from "@misogohei/misocmd";
 
 Deno.test(function commandLS() {
   const lsCmd = buildMisoCommand("ls")
-    .command("list", [])
+    .command("list")
     .build();
 
   assertExists(lsCmd);
   assertExists(lsCmd.list);
-  const result = lsCmd.list(["."]);
+  const result = lsCmd.list();
   assertEquals(result.asText().length > 0, true);
 });
 

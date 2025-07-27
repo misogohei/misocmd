@@ -79,7 +79,7 @@ class MisoCommandExecutor {
 }
 
 type MisoCommandFunc = (
-  args: string[],
+  args?: string[],
   option?: SpawnSyncOptions,
 ) => MisoCommandResult;
 
@@ -101,8 +101,8 @@ function createMisoCommand<T extends string>(
   executor: MisoCommandExecutor,
 ): MisoCommand<T> {
   const obj: Record<string, MisoCommandFunc> = {};
-  obj[name] = (ext_args: string[], option?: SpawnSyncOptions) => {
-    return executor.execute(args, ext_args, option);
+  obj[name] = (ext_args?: string[], option?: SpawnSyncOptions) => {
+    return executor.execute(args, ext_args ?? [], option);
   };
   return obj as MisoCommand<T>;
 }
