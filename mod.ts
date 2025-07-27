@@ -3,31 +3,59 @@ import { spawnSync } from "node:child_process";
 import type { SpawnSyncOptions, SpawnSyncReturns } from "node:child_process";
 
 export interface IMisoBuildOption {
+  /**
+   * Timeout seconds of execution.
+   * This parameter will be past to spawnSync.
+   */
   timeout?: number;
 }
 
+/**
+ * Command result wrapped SpawnSyncReturns
+ */
 export class MisoCommandResult {
+  /**
+   * Raw result of spawnSync
+   */
   public readonly spawnResult: SpawnSyncReturns<
     Buffer<ArrayBufferLike> | string
   >;
+
   constructor(result: SpawnSyncReturns<Buffer<ArrayBufferLike> | string>) {
     this.spawnResult = result;
   }
 
+  /**
+   * Exit code of executed command.
+   */
   public get exitCode(): number | null {
     return this.spawnResult.status;
   }
 
-  public get asText(): string {
+  /**
+   * @returns The text of the stdout output of the executed command..
+   */
+  public asText(): string {
     return this.spawnResult.stdout.toString();
   }
 
-  public get asObject(): object | null {
-    return JSON.parse(this.asText);
+  /**
+   * @returns The stdout output text of the executed command parsed as JSON.
+   */
+  public asObject(): object | null {
+    return JSON.parse(this.asText());
+  }
+
+  /**
+   * @param type MIME type of blob
+   * @returns The stdout output of the executed command converted to a BLOB.
+   */
+  public asBlob(type?: string): Blob {
+    return new Blob([this.spawnResult.stdout], { type });
   }
 }
 
-export class MisoCommandExecutor {
+class MisoCommandExecutor {
   private path: string;
   private option?: IMisoBuildOption;
 
@@ -109,6 +137,12 @@ function appendMisoCommand<T extends string>(
   };
 }
 
+/**
+ * Start to build MisoCommand
+ * @param path file path to executable command
+ * @param option common option to each commands.
+ * @returns instance of building interface
+ */
 export function buildMisoCommand(
   path: string,
   option?: IMisoBuildOption,

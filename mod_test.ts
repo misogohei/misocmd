@@ -9,7 +9,7 @@ Deno.test(function commandLS() {
   assertExists(lsCmd);
   assertExists(lsCmd.list);
   const result = lsCmd.list(["."]);
-  assertEquals(result.asText.length > 0, true);
+  assertEquals(result.asText().length > 0, true);
 });
 
 Deno.test(function commandCAT() {
@@ -24,7 +24,7 @@ Deno.test(function commandCAT() {
     input: '{"name1": 1, "name2": "value2"}',
   });
 
-  assertEquals(result.asObject, {
+  assertEquals(result.asObject(), {
     name1: 1,
     name2: "value2",
   });
