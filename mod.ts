@@ -2,14 +2,6 @@ import type { Buffer } from "node:buffer";
 import { spawnSync } from "node:child_process";
 import type { SpawnSyncOptions, SpawnSyncReturns } from "node:child_process";
 
-export interface IMisoBuildOption {
-  /**
-   * Timeout seconds of execution.
-   * This parameter will be past to spawnSync.
-   */
-  timeout?: number;
-}
-
 /**
  * Command result wrapped SpawnSyncReturns
  */
@@ -33,7 +25,7 @@ export class MisoCommandResult {
   }
 
   /**
-   * @returns The text of the stdout output of the executed command..
+   * @returns The text of the stdout output of the executed command.
    */
   public asText(): string {
     return this.spawnResult.stdout.toString();
@@ -53,27 +45,32 @@ export class MisoCommandResult {
   public asBlob(type?: string): Blob {
     return new Blob([this.spawnResult.stdout], { type });
   }
+
+  /**
+   * @returns The text lines of the stdout output of the executed command.
+   */
+  public asLines(): string[] {
+    return this.asText().split("\n");
+  }
 }
 
 class MisoCommandExecutor {
   private path: string;
-  private option?: IMisoBuildOption;
+  private option?: SpawnSyncOptions;
 
-  constructor(path: string, option?: IMisoBuildOption) {
+  constructor(path: string, option?: SpawnSyncOptions) {
     this.path = path;
     this.option = option;
   }
 
   public execute(
     args: string[],
-    ext_args: string[],
+    extraArgs: string[],
     option?: SpawnSyncOptions,
   ): MisoCommandResult {
-    if (option != null) {
-      option.timeout ??= this.option?.timeout;
-    }
+    const _option = Object.assign({}, this.option, option);
     return new MisoCommandResult(
-      spawnSync(this.path, [...args, ...ext_args], option ?? {}),
+      spawnSync(this.path, [...args, ...extraArgs], _option),
     );
   }
 }
@@ -88,7 +85,7 @@ type MisoCommand<T extends string> = {
 };
 
 interface IMisoCommandBuilder<T extends string> {
-  build: () => MisoCommand<T> | undefined;
+  build: () => MisoCommand<T>;
   command: <T2 extends string>(
     name: T2,
     args?: string[],
@@ -101,8 +98,8 @@ function createMisoCommand<T extends string>(
   executor: MisoCommandExecutor,
 ): MisoCommand<T> {
   const obj: Record<string, MisoCommandFunc> = {};
-  obj[name] = (ext_args?: string[], option?: SpawnSyncOptions) => {
-    return executor.execute(args, ext_args ?? [], option);
+  obj[name] = (extraArgs?: string[], option?: SpawnSyncOptions) => {
+    return executor.execute(args, extraArgs ?? [], option);
   };
   return obj as MisoCommand<T>;
 }
@@ -112,8 +109,7 @@ function combineMisoCommand<T extends string, T2 extends string>(
   c2: MisoCommand<T2>,
 ): MisoCommand<T | T2> {
   const obj = {};
-  Object.assign(obj, c1);
-  Object.assign(obj, c2);
+  Object.assign(obj, c1, c2);
   return obj as MisoCommand<T | T2>;
 }
 
@@ -122,7 +118,7 @@ function appendMisoCommand<T extends string>(
   executor: MisoCommandExecutor,
 ): IMisoCommandBuilder<T> {
   return {
-    build: () => {
+    build: (): MisoCommand<T> => {
       return obj;
     },
     command: <T2 extends string>(name2: T2, args2?: string[]) => {
@@ -145,7 +141,7 @@ function appendMisoCommand<T extends string>(
  */
 export function buildMisoCommand(
   path: string,
-  option?: IMisoBuildOption,
+  option?: SpawnSyncOptions,
 ): IMisoCommandBuilder<""> {
   const executor = new MisoCommandExecutor(path, option);
   return appendMisoCommand(createMisoCommand("", [], executor), executor);
