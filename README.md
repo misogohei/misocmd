@@ -12,9 +12,9 @@ See. [JSR Repo](https://jsr.io/@misogohei/misocmd)
 import { buildMisoCommand } from "@misogohei/misocmd";
 
 const deno = buildMisoCommand("deno")
-  .command("compile")
-  .command("run", ["-A"])
-  .command("test")
+  .command("compile", ["compile"])
+  .command("run", ["run", "-A"])
+  .command("test", ["test"])
   .build();
 
 deno.compile(["file.ts"]); // deno compile file.ts
