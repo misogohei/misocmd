@@ -1,6 +1,6 @@
 ## Overview
 
-Wrap ```spawnSync``` to handle commands.
+Wrap `spawnSync` to handle commands.
 
 ## Install
 
@@ -12,14 +12,14 @@ See. [JSR Repo](https://jsr.io/@misogohei/misocmd)
 import { buildMisoCommand } from "@misogohei/misocmd";
 
 const deno = buildMisoCommand("deno")
-            .command("compile")
-            .command("run", ["-A"])
-            .command("test")
-            .build();
+  .command("compile")
+  .command("run", ["-A"])
+  .command("test")
+  .build();
 
-deno.compile(["file.ts"]) // deno compile file.ts 
-deno.run(["file.ts"]);    // deno run -A file.ts
-deno.test();              // deno test
+deno.compile(["file.ts"]); // deno compile file.ts
+deno.run(["file.ts"]); // deno run -A file.ts
+deno.test(); // deno test
 ```
 
 ```typescript

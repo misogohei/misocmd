@@ -76,7 +76,11 @@ class MisoCommandExecutor {
 }
 
 type MisoCommandFunc = (
+  /** additional arguments */
   args?: string[],
+  /** option for spawnSync
+   * This option override and merge buildMisoCommand's option.
+   */
   option?: SpawnSyncOptions,
 ) => MisoCommandResult;
 
@@ -85,9 +89,13 @@ type MisoCommand<T extends string> = {
 };
 
 interface IMisoCommandBuilder<T extends string> {
+  /** complete to build command */
   build: () => MisoCommand<T>;
+  /** add command with preset arguments  */
   command: <T2 extends string>(
+    /** name of command */
     name: T2,
+    /** preset arguments */
     args?: string[],
   ) => IMisoCommandBuilder<T | T2>;
 }
