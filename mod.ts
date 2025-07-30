@@ -90,7 +90,7 @@ type MisoCommand<T extends string> = {
 
 interface IMisoCommandBuilder<T extends string> {
   /** complete to build command */
-  build: () => MisoCommand<T>;
+  build: () => MisoCommand<Exclude<T, "">>;
   /** add command with preset arguments  */
   command: <T2 extends string>(
     /** name of command */
@@ -126,7 +126,7 @@ function appendMisoCommand<T extends string>(
   executor: MisoCommandExecutor,
 ): IMisoCommandBuilder<T> {
   return {
-    build: (): MisoCommand<T> => {
+    build: (): MisoCommand<Exclude<T, "">> => {
       return obj;
     },
     command: <T2 extends string>(name2: T2, args2?: string[]) => {
